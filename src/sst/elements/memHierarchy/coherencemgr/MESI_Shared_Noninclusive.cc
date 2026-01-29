@@ -337,7 +337,7 @@ bool MESISharNoninclusive::handleGetS(MemEvent* event, bool in_mshr) {
                     stat_event_state_[(int)Command::GetS][state]->addData(1);
                     stat_miss_[0][in_mshr]->addData(1);
                     stat_misses_->addData(1);
-                    notifyListenerOfAccess(event, NotifyAccessType::READ, NotifyResultType::MISS);
+                    notifyListenerOfAccess(event, NotifyAccessType::READ, NotifyResultType::MISS, tag->getPrefetch());
                     mshr_->setProfiled(addr);
                 }
 
@@ -355,7 +355,7 @@ bool MESISharNoninclusive::handleGetS(MemEvent* event, bool in_mshr) {
                 stat_event_state_[(int)Command::GetS][S]->addData(1);
                 stat_hit_[0][in_mshr]->addData(1);
                 stat_hits_->addData(1);
-                notifyListenerOfAccess(event, NotifyAccessType::READ, NotifyResultType::HIT);
+                notifyListenerOfAccess(event, NotifyAccessType::READ, NotifyResultType::HIT, tag->getPrefetch());
                 if (in_mshr) mshr_->setProfiled(addr);
             }
 
@@ -405,7 +405,7 @@ bool MESISharNoninclusive::handleGetS(MemEvent* event, bool in_mshr) {
                 stat_event_state_[(int)Command::GetS][state]->addData(1);
                 stat_hit_[0][in_mshr]->addData(1);
                 stat_hits_->addData(1);
-                notifyListenerOfAccess(event, NotifyAccessType::READ, NotifyResultType::HIT);
+                notifyListenerOfAccess(event, NotifyAccessType::READ, NotifyResultType::HIT, tag->getPrefetch());
                 if (in_mshr) mshr_->setProfiled(addr);
             }
 
@@ -519,7 +519,7 @@ bool MESISharNoninclusive::handleGetX(MemEvent * event, bool in_mshr) {
                     stat_event_state_[(int)event->getCmd()][I]->addData(1);
                     stat_miss_[(event->getCmd() == Command::GetX ? 1 : 2)][in_mshr]->addData(1);
                     stat_misses_->addData(1);
-                    notifyListenerOfAccess(event, NotifyAccessType::WRITE, NotifyResultType::MISS);
+                    notifyListenerOfAccess(event, NotifyAccessType::WRITE, NotifyResultType::MISS, tag->getPrefetch());
                     mshr_->setProfiled(addr);
                 }
                 send_time = forwardMessage(event, line_size_, 0, nullptr);
@@ -539,7 +539,7 @@ bool MESISharNoninclusive::handleGetX(MemEvent * event, bool in_mshr) {
                         stat_event_state_[(int)event->getCmd()][S]->addData(1);
                         stat_miss_[(event->getCmd() == Command::GetX ? 1 : 2)][in_mshr]->addData(1);
                         stat_misses_->addData(1);
-                        notifyListenerOfAccess(event, NotifyAccessType::WRITE, NotifyResultType::MISS);
+                        notifyListenerOfAccess(event, NotifyAccessType::WRITE, NotifyResultType::MISS, tag->getPrefetch());
                         mshr_->setProfiled(addr);
                     }
                     recordPrefetchResult(tag, stat_prefetch_upgrade_miss_);
@@ -566,7 +566,7 @@ bool MESISharNoninclusive::handleGetX(MemEvent * event, bool in_mshr) {
                 if (mem_h_is_debug_event(event))
                     event_debuginfo_.reason = "hit";
                 if (!in_mshr || !mshr_->getProfiled(addr)) {
-                    notifyListenerOfAccess(event, NotifyAccessType::WRITE, NotifyResultType::HIT);
+                    notifyListenerOfAccess(event, NotifyAccessType::WRITE, NotifyResultType::HIT, tag->getPrefetch());
                     stat_event_state_[(int)event->getCmd()][state]->addData(1);
                     stat_hit_[(event->getCmd() == Command::GetX ? 1 : 2)][in_mshr]->addData(1);
                     stat_hits_->addData(1);
@@ -591,7 +591,7 @@ bool MESISharNoninclusive::handleGetX(MemEvent * event, bool in_mshr) {
                 status = allocateMSHR(event, false);
             if (status == MemEventStatus::OK) {
                 if (!mshr_->getProfiled(addr)) {
-                    notifyListenerOfAccess(event, NotifyAccessType::WRITE, NotifyResultType::HIT);
+                    notifyListenerOfAccess(event, NotifyAccessType::WRITE, NotifyResultType::HIT, tag->getPrefetch());
                     stat_event_state_[(int)event->getCmd()][state]->addData(1);
                     stat_hit_[(event->getCmd() == Command::GetX ? 1 : 2)][in_mshr]->addData(1);
                     stat_hits_->addData(1);

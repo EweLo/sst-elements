@@ -268,7 +268,7 @@ private:
     /** Statistics/Listeners */
     inline void recordPrefetchResult(L1CacheLine * line, Statistic<uint64_t>* stat);
     void recordLatency(Command cmd, int type, uint64_t latency) override;
-    void eventProfileAndNotify(MemEvent * event, State state, NotifyAccessType type, NotifyResultType result, bool in_mshr);
+    void eventProfileAndNotify(MemEvent * event, State state, NotifyAccessType type, NotifyResultType result, bool in_mshr, bool line_was_prefetched);
 
     /** Miscellaneous */
     void printLine(Addr addr);

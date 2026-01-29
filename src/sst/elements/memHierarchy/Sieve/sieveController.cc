@@ -142,7 +142,8 @@ void Sieve::processEvent(SST::Event* ev, int link) {
                                              event->getSize(),
                                              isRead ? READ : WRITE,
                                              MISS,
-                                             event->getID());
+                                             event->getID(),
+                                             cline->getPrefetch());
             listener_->notifyAccess(notify);
         }
 

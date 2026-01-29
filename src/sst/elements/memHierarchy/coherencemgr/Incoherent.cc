@@ -172,7 +172,7 @@ bool Incoherent::handleGetS(MemEvent * event, bool in_mshr) {
             if (status == MemEventStatus::OK) {
                 if (!mshr_->getProfiled(addr)) {
                     stat_event_state_[(int)Command::GetS][I]->addData(1);
-                    notifyListenerOfAccess(event, NotifyAccessType::READ, NotifyResultType::MISS);
+                    notifyListenerOfAccess(event, NotifyAccessType::READ, NotifyResultType::MISS, line->getPrefetch());
                     mshr_->setProfiled(addr);
                     stat_misses_->addData(1);
                     stat_miss_[0][(int)in_mshr]->addData(1);
@@ -191,7 +191,7 @@ bool Incoherent::handleGetS(MemEvent * event, bool in_mshr) {
         case E:
         case M:
             if (!in_mshr || mshr_->getProfiled(addr)) {
-                notifyListenerOfAccess(event, NotifyAccessType::READ, NotifyResultType::HIT);
+                notifyListenerOfAccess(event, NotifyAccessType::READ, NotifyResultType::HIT, line->getPrefetch());
                 stat_event_state_[(int)Command::GetS][state]->addData(1);
                 stat_hit_[0][(int)in_mshr]->addData(1);
                 stat_hits_->addData(1);
@@ -248,7 +248,7 @@ bool Incoherent::handleGetX(MemEvent * event, bool in_mshr) {
             if (status == MemEventStatus::OK) {
                 if (!mshr_->getProfiled(addr)) {
                     stat_event_state_[(int)event->getCmd()][I]->addData(1);
-                    notifyListenerOfAccess(event, NotifyAccessType::WRITE, NotifyResultType::MISS);
+                    notifyListenerOfAccess(event, NotifyAccessType::WRITE, NotifyResultType::MISS, line->getPrefetch());
                     mshr_->setProfiled(addr);
                     if (event->getCmd() == Command::GetX)
                         stat_miss_[1][(int)in_mshr]->addData(1);
@@ -266,7 +266,7 @@ bool Incoherent::handleGetX(MemEvent * event, bool in_mshr) {
         case E:
         case M:
             if (!in_mshr || !mshr_->getProfiled(addr)) {
-                notifyListenerOfAccess(event, NotifyAccessType::WRITE, NotifyResultType::HIT);
+                notifyListenerOfAccess(event, NotifyAccessType::WRITE, NotifyResultType::HIT, line->getPrefetch());
                 stat_event_state_[(int)event->getCmd()][I]->addData(1);
                 if (event->getCmd() == Command::GetX)
                     stat_hit_[1][(int)in_mshr]->addData(1);

@@ -266,7 +266,7 @@ bool MESIPrivNoninclusive::handleGetS(MemEvent* event, bool in_mshr) {
                     stat_event_state_[(int)Command::GetS][I]->addData(1);
                     stat_miss_[0][in_mshr]->addData(1);
                     stat_misses_->addData(1);
-                    notifyListenerOfAccess(event, NotifyAccessType::READ, NotifyResultType::MISS);
+                    notifyListenerOfAccess(event, NotifyAccessType::READ, NotifyResultType::MISS, line->getPrefetch());
                     mshr_->setProfiled(addr);
                 }
                 recordLatencyType(event->getID(), LatType::MISS);
@@ -282,7 +282,7 @@ bool MESIPrivNoninclusive::handleGetS(MemEvent* event, bool in_mshr) {
                 stat_event_state_[(int)Command::GetS][S]->addData(1);
                 stat_hit_[0][in_mshr]->addData(1);
                 stat_hits_->addData(1);
-                notifyListenerOfAccess(event, NotifyAccessType::READ, NotifyResultType::HIT);
+                notifyListenerOfAccess(event, NotifyAccessType::READ, NotifyResultType::HIT, line->getPrefetch());
             }
             line->setShared(true);
             send_time = sendResponseUp(event, line->getData(), in_mshr, line->getTimestamp());
@@ -298,7 +298,7 @@ bool MESIPrivNoninclusive::handleGetS(MemEvent* event, bool in_mshr) {
                 stat_event_state_[(int)Command::GetS][state]->addData(1);
                 stat_hit_[0][in_mshr]->addData(1);
                 stat_hits_->addData(1);
-                notifyListenerOfAccess(event, NotifyAccessType::READ, NotifyResultType::HIT);
+                notifyListenerOfAccess(event, NotifyAccessType::READ, NotifyResultType::HIT, line->getPrefetch());
             }
             if (mem_h_is_debug_event(event))
                 event_debuginfo_.reason = "hit";
@@ -361,7 +361,7 @@ bool MESIPrivNoninclusive::handleGetX(MemEvent* event, bool in_mshr) {
                     stat_event_state_[(int)event->getCmd()][state]->addData(1);
                     stat_miss_[(event->getCmd() == Command::GetX ? 1 : 2)][in_mshr]->addData(1);
                     stat_misses_->addData(1);
-                    notifyListenerOfAccess(event, NotifyAccessType::WRITE, NotifyResultType::MISS);
+                    notifyListenerOfAccess(event, NotifyAccessType::WRITE, NotifyResultType::MISS, line->getPrefetch());
                     mshr_->setProfiled(addr);
                 }
                 send_time = forwardMessage(event, line_size_, 0, nullptr);
@@ -384,7 +384,7 @@ bool MESIPrivNoninclusive::handleGetX(MemEvent* event, bool in_mshr) {
                 stat_event_state_[(int)event->getCmd()][state]->addData(1);
                 stat_hit_[(event->getCmd() == Command::GetX ? 1 : 2)][in_mshr]->addData(1);
                 stat_hits_->addData(1);
-                notifyListenerOfAccess(event, NotifyAccessType::WRITE, NotifyResultType::HIT);
+                notifyListenerOfAccess(event, NotifyAccessType::WRITE, NotifyResultType::HIT, line->getPrefetch());
             }
             line->setOwned(true);
             line->setShared(false);

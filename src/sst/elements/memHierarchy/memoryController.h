@@ -115,7 +115,7 @@ protected:
         if (  ! listeners_.empty()) {
             // AFR: should this pass the base Addr?
             CacheListenerNotification notify(ev->getAddr(), ev->getAddr(), ev->getVirtualAddress(),
-                        ev->getInstructionPointer(), ev->getSize(), READ, HIT, ev->getID());
+                        ev->getInstructionPointer(), ev->getSize(), READ, HIT, ev->getID(), false);
 
             for (unsigned long int i = 0; i < listeners_.size(); ++i) {
                 listeners_[i]->notifyAccess(notify);

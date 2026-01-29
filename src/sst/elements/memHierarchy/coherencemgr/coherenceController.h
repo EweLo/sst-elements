@@ -212,7 +212,7 @@ protected:
      *********************************************************************************/
 
     /* Listener callbacks */
-    virtual void notifyListenerOfAccess(MemEvent * event, NotifyAccessType access_type, NotifyResultType result_type);
+    virtual void notifyListenerOfAccess(MemEvent * event, NotifyAccessType access_type, NotifyResultType result_type, bool line_was_prefetched);
     virtual void notifyListenerOfEvict(Addr addr, uint32_t size, Addr ip, MemEventBase::id_type evId);
 
     /* Forward a message to a lower memory level (towards memory) */

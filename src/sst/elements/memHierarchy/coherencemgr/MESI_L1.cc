@@ -262,7 +262,7 @@ bool MESIL1::handleGetS(MemEvent * event, bool in_mshr) {
                     stat_event_state_[(int)Command::GetS][I]->addData(1);
                     stat_miss_[0][in_mshr]->addData(1);
                     stat_misses_->addData(1);
-                    notifyListenerOfAccess(event, NotifyAccessType::READ, NotifyResultType::MISS);
+                    notifyListenerOfAccess(event, NotifyAccessType::READ, NotifyResultType::MISS, line->getPrefetch());
                     mshr_->setProfiled(addr);
                 }
                 send_time = forwardMessage(event, line_size_, 0, nullptr);
@@ -283,7 +283,7 @@ bool MESIL1::handleGetS(MemEvent * event, bool in_mshr) {
                 stat_event_state_[(int)Command::GetS][state]->addData(1);
                 stat_hit_[0][in_mshr]->addData(1);
                 stat_hits_->addData(1);
-                notifyListenerOfAccess(event, NotifyAccessType::READ, NotifyResultType::HIT);
+                notifyListenerOfAccess(event, NotifyAccessType::READ, NotifyResultType::HIT, line->getPrefetch());
             }
 
             if (local_prefetch) {
@@ -381,7 +381,7 @@ bool MESIL1::handleGetX(MemEvent* event, bool in_mshr) {
             if (status == MemEventStatus::OK) {
                 line = cache_array_->lookup(addr, false);
                 if (!mshr_->getProfiled(addr)) {
-                    notifyListenerOfAccess(event, NotifyAccessType::WRITE, NotifyResultType::MISS);
+                    notifyListenerOfAccess(event, NotifyAccessType::WRITE, NotifyResultType::MISS, line->getPrefetch());
                     stat_event_state_[(int)Command::GetX][I]->addData(1);
                     stat_miss_[1][in_mshr]->addData(1);
                     stat_misses_->addData(1);
@@ -412,7 +412,7 @@ bool MESIL1::handleGetX(MemEvent* event, bool in_mshr) {
             status = processCacheMiss(event, line, in_mshr); // Just acquire an MSHR entry
             if (status == MemEventStatus::OK) {
                 if (!mshr_->getProfiled(addr)) {
-                    notifyListenerOfAccess(event, NotifyAccessType::WRITE, NotifyResultType::MISS);
+                    notifyListenerOfAccess(event, NotifyAccessType::WRITE, NotifyResultType::MISS, line->getPrefetch());
                     recordLatencyType(event->getID(), LatType::UPGRADE);
                     stat_event_state_[(int)Command::GetX][S]->addData(1);
                     stat_miss_[1][in_mshr]->addData(1);
@@ -434,7 +434,7 @@ bool MESIL1::handleGetX(MemEvent* event, bool in_mshr) {
         case M:
             recordPrefetchResult(line, stat_prefetch_hit_);
             if (!in_mshr || !mshr_->getProfiled(addr)) {
-                notifyListenerOfAccess(event, NotifyAccessType::WRITE, NotifyResultType::HIT);
+                notifyListenerOfAccess(event, NotifyAccessType::WRITE, NotifyResultType::HIT, line->getPrefetch());
                 recordLatencyType(event->getID(), LatType::HIT);
                 stat_event_state_[(int)Command::GetX][state]->addData(1);
                 stat_hit_[1][in_mshr]->addData(1);
@@ -520,7 +520,7 @@ bool MESIL1::handleGetSX(MemEvent* event, bool in_mshr) {
             if (status == MemEventStatus::OK) {
                 line = cache_array_->lookup(addr, false);
                 if (!mshr_->getProfiled(addr)) {
-                    notifyListenerOfAccess(event, NotifyAccessType::READ, NotifyResultType::MISS);
+                    notifyListenerOfAccess(event, NotifyAccessType::READ, NotifyResultType::MISS, line->getPrefetch());
                     stat_event_state_[(int)Command::GetSX][I]->addData(1);
                     stat_miss_[2][in_mshr]->addData(1);
                     stat_misses_->addData(1);
@@ -542,7 +542,7 @@ bool MESIL1::handleGetSX(MemEvent* event, bool in_mshr) {
             status = processCacheMiss(event, line, in_mshr); // Just acquire an MSHR entry
             if (status == MemEventStatus::OK) {
                 if (!mshr_->getProfiled(addr)) {
-                    notifyListenerOfAccess(event, NotifyAccessType::WRITE, NotifyResultType::MISS);
+                    notifyListenerOfAccess(event, NotifyAccessType::WRITE, NotifyResultType::MISS, line->getPrefetch());
                     recordLatencyType(event->getID(), LatType::UPGRADE);
                     stat_event_state_[(int)Command::GetSX][S]->addData(1);
                     stat_miss_[2][in_mshr]->addData(1);
@@ -563,7 +563,7 @@ bool MESIL1::handleGetSX(MemEvent* event, bool in_mshr) {
         case M:
             recordPrefetchResult(line, stat_prefetch_hit_);
             if (!in_mshr || !mshr_->getProfiled(addr)) {
-                notifyListenerOfAccess(event, NotifyAccessType::READ, NotifyResultType::HIT);
+                notifyListenerOfAccess(event, NotifyAccessType::READ, NotifyResultType::HIT, line->getPrefetch());
                 recordLatencyType(event->getID(), LatType::HIT);
                 stat_event_state_[(int)Command::GetSX][state]->addData(1);
                 stat_hit_[2][in_mshr]->addData(1);
@@ -2010,10 +2010,10 @@ void MESIL1::recordLatency(Command cmd, int type, uint64_t latency) {
 }
 
 
-void MESIL1::eventProfileAndNotify(MemEvent * event, State state, NotifyAccessType type, NotifyResultType result, bool in_mshr) {
+void MESIL1::eventProfileAndNotify(MemEvent * event, State state, NotifyAccessType type, NotifyResultType result, bool in_mshr, bool line_was_prefetched) {
     if (!in_mshr || !mshr_->getProfiled(event->getBaseAddr())) {
         stat_event_state_[(int)event->getCmd()][state]->addData(1); // Profile event receive
-        notifyListenerOfAccess(event, type, result);
+        notifyListenerOfAccess(event, type, result, line_was_prefetched);
         if (in_mshr)
             mshr_->setProfiled(event->getBaseAddr());
     }

@@ -595,12 +595,12 @@ void CoherenceController::clearRetryBuffer() {
 
 
 /* Listener callbacks */
-void CoherenceController::notifyListenerOfAccess(MemEvent * event, NotifyAccessType access_type, NotifyResultType result_type) {
+void CoherenceController::notifyListenerOfAccess(MemEvent * event, NotifyAccessType access_type, NotifyResultType result_type, bool line_was_prefetched) {
     if (event->isPrefetch())
         access_type = NotifyAccessType::PREFETCH;
 
     CacheListenerNotification notify(event->getAddr(), event->getBaseAddr(), event->getVirtualAddress(),
-            event->getInstructionPointer(), event->getSize(), access_type, result_type, event->getID());
+            event->getInstructionPointer(), event->getSize(), access_type, result_type, event->getID(), line_was_prefetched);
 
     for (int i = 0; i < listeners_.size(); i++)
         listeners_[i]->notifyAccess(notify);
@@ -608,7 +608,7 @@ void CoherenceController::notifyListenerOfAccess(MemEvent * event, NotifyAccessT
 
 
 void CoherenceController::notifyListenerOfEvict(Addr addr, uint32_t size, Addr ip, MemEventBase::id_type evId) {
-    CacheListenerNotification notify(addr, addr, 0, ip, size, EVICT, NA, evId);
+    CacheListenerNotification notify(addr, addr, 0, ip, size, EVICT, NA, evId, false);
 
     for (int i = 0; i < listeners_.size(); i++) {
         listeners_[i]->notifyAccess(notify);
