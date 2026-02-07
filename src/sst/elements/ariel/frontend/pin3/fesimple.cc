@@ -558,6 +558,56 @@ VOID InstrumentInstruction(INS ins, VOID *v)
         }
     }
 
+    OPCODE opcode = INS_Opcode(ins);
+
+    // POP instruction: implicit load from stack
+    if (opcode == XED_ICLASS_POP) {
+        INS_InsertPredicatedCall(ins, IPOINT_BEFORE, (AFUNPTR)
+                WriteInstructionReadOnly,
+                IARG_THREAD_ID,
+                IARG_REG_VALUE, REG_STACK_PTR,  // Stack pointer = address
+                IARG_UINT32, 8,  // 8 bytes for 64-bit, use 4 for 32-bit
+                IARG_INST_PTR,
+                IARG_UINT32, ARIEL_INST_UNKNOWN,
+                IARG_UINT32, 1,
+                IARG_BOOL, true,   // first
+                IARG_BOOL, true,   // last
+                IARG_END);
+        return;  // Skip normal instrumentation
+    }
+
+    // RET instruction: implicit load of return address
+    if (opcode == XED_ICLASS_RET_NEAR || opcode == XED_ICLASS_RET_FAR) {
+        INS_InsertPredicatedCall(ins, IPOINT_BEFORE, (AFUNPTR)
+                WriteInstructionReadOnly,
+                IARG_THREAD_ID,
+                IARG_REG_VALUE, REG_STACK_PTR,
+                IARG_UINT32, 8,  // Return address size
+                IARG_INST_PTR,
+                IARG_UINT32, ARIEL_INST_UNKNOWN,
+                IARG_UINT32, 1,
+                IARG_BOOL, true,
+                IARG_BOOL, true,
+                IARG_END);
+        return;  // Skip normal instrumentation
+    }
+
+    // LEAVE instruction: implicit load of frame pointer
+    if (opcode == XED_ICLASS_LEAVE) {
+        INS_InsertPredicatedCall(ins, IPOINT_BEFORE, (AFUNPTR)
+                WriteInstructionReadOnly,
+                IARG_THREAD_ID,
+                IARG_REG_VALUE, REG_GBP,  // Base pointer
+                IARG_UINT32, 8,
+                IARG_INST_PTR,
+                IARG_UINT32, ARIEL_INST_UNKNOWN,
+                IARG_UINT32, 1,
+                IARG_BOOL, true,
+                IARG_BOOL, true,
+                IARG_END);
+        return;  // Skip normal instrumentation
+    }
+
     UINT32 operands = INS_MemoryOperandCount(ins);
     if (INS_HasScatteredMemoryAccess(ins))
         operands = 0;
