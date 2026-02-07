@@ -10,6 +10,8 @@ AM_CPPFLAGS += \
 	$(MPI_CPPFLAGS) \
 	-I$(top_srcdir)/src
 
+AM_CFLAGS = $(CFLAGS_LOCAL)
+
 lib_LTLIBRARIES = libarielapi.la
 
 libarielapi_la_SOURCES = \
