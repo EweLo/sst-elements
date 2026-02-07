@@ -719,6 +719,13 @@ VOID InstrumentInstruction(INS ins, VOID *v)
     }
 }
 
+VOID ImageLoad(IMG img, VOID *v)
+{
+    std::string img_name = IMG_Name(img);
+
+    fprintf(stderr, "ARIEL: Instrumenting image: %s\n", img_name.c_str());
+}
+
 /* Intercept ariel_enable() in application & start simulating instructions */
 void mapped_ariel_enable()
 {
@@ -1596,6 +1603,8 @@ int main(int argc, char *argv[])
 
     // Fork callback
     PIN_AddForkFunction(FPOINT_AFTER_IN_CHILD, (FORK_CALLBACK) fork_disable_child_output, NULL);
+
+    IMG_AddInstrumentFunction(ImageLoad, 0);
 
     fprintf(stderr, "ARIEL: Starting program.\n");
     fflush(stdout);
