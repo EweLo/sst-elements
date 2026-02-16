@@ -34,7 +34,7 @@ NextBlockPrefetcher::NextBlockPrefetcher(ComponentId_t id, Params& params) : Cac
     statPrefetchEventsIssued = registerStatistic<uint64_t>("prefetches_issued");
     statMissEventsProcessed  = registerStatistic<uint64_t>("miss_events_processed");
     statHitEventsProcessed   = registerStatistic<uint64_t>("hit_events_processed");
-    statPrefetchEventsRecv = registerStatistic<uint64_t>("prefetches_recv");
+    statPrefetchEventsRecv = registerStatistic<uint64_t>("prefetch_events_recv");
 }
 
 NextBlockPrefetcher::~NextBlockPrefetcher() {}
