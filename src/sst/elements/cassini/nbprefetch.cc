@@ -50,6 +50,7 @@ void NextBlockPrefetcher::notifyAccess(const CacheListenerNotification& notify) 
                 statMissEventsProcessed->addData(1);
             } else {
                 statHitEventsProcessed->addData(1);
+                return;
             }
 
             Addr nextBlockAddr = (addr - (addr % blockSize)) + blockSize;
