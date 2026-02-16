@@ -45,8 +45,12 @@ void NextBlockPrefetcher::notifyAccess(const CacheListenerNotification& notify) 
     const Addr addr = notify.getPhysicalAddress();
 
     if (notifyType == READ || notifyType == WRITE) { // ignore evicts
-        if(notifyResType == MISS) {
-            statMissEventsProcessed->addData(1);
+        if(notifyResType != NA) {
+            if (notifyResType == MISS) {
+                statMissEventsProcessed->addData(1);
+            } else {
+                statHitEventsProcessed->addData(1);
+            }
 
             Addr nextBlockAddr = (addr - (addr % blockSize)) + blockSize;
             std::vector<Event::HandlerBase*>::iterator callbackItr;
@@ -62,7 +66,7 @@ void NextBlockPrefetcher::notifyAccess(const CacheListenerNotification& notify) 
                 (*(*callbackItr))(newEv);
             }
         } else {
-            statHitEventsProcessed->addData(1);
+            std::cout << "NBPrefetch received NA Event" << std::endl;
         }
     } else if (notifyType == PREFETCH) {
         statPrefetchEventsRecv->addData(1);
