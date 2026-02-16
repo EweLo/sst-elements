@@ -59,7 +59,8 @@ public:
     SST_ELI_DOCUMENT_STATISTICS(
         { "prefetches_issued", "Number of prefetch requests issued", "prefetches", 1 },
         { "miss_events_processed", "Number of cache misses received", "misses", 2 },
-        { "hit_events_processed", "Number of cache hits received", "hits", 2 }
+        { "hit_events_processed", "Number of cache hits received", "hits", 2 },
+        { "prefetch_events_recv", "Number of prefetch events received", "events", 2 }
     )
 
 
@@ -75,6 +76,7 @@ private:
     Statistic<uint64_t>* statPrefetchEventsIssued;
     Statistic<uint64_t>* statMissEventsProcessed;
     Statistic<uint64_t>* statHitEventsProcessed;
+    Statistic<uint64_t>* statPrefetchEventsRecv;
 
 };
 

@@ -34,6 +34,7 @@ NextBlockPrefetcher::NextBlockPrefetcher(ComponentId_t id, Params& params) : Cac
     statPrefetchEventsIssued = registerStatistic<uint64_t>("prefetches_issued");
     statMissEventsProcessed  = registerStatistic<uint64_t>("miss_events_processed");
     statHitEventsProcessed   = registerStatistic<uint64_t>("hit_events_processed");
+    statPrefetchEventsRecv = registerStatistic<uint64_t>("prefetches_recv");
 }
 
 NextBlockPrefetcher::~NextBlockPrefetcher() {}
@@ -63,6 +64,8 @@ void NextBlockPrefetcher::notifyAccess(const CacheListenerNotification& notify) 
         } else {
             statHitEventsProcessed->addData(1);
         }
+    } else if (notifyType == PREFETCH) {
+        statPrefetchEventsRecv->addData(1);
     }
 }
 
@@ -82,5 +85,6 @@ void NextBlockPrefetcher::serialize_order(SST::Core::Serialization::serializer& 
     SST_SER(statPrefetchEventsIssued);
     SST_SER(statMissEventsProcessed);
     SST_SER(statHitEventsProcessed);
+    SST_SER(statPrefetchEventsRecv);
 }
 
